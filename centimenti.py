@@ -30,6 +30,10 @@ parser.add_argument('-a', '--number_of_answers',
     default=4,
     metavar='',
     help='Specify the maximum number of answers the player can choose in each question.')
+parser.add_argument('-n', '--player_names',
+    nargs='+',
+    default=['Alice', 'Bob'],
+    help='Specify a list of names that will be used to create the players.')
 args = parser.parse_args()
 
 
@@ -95,6 +99,12 @@ def player_thread_function(game_code, player_name, answers):
 event_join_game = threading.Event()
 
 
+def get_player_names(number_of_players):
+    player_names = []
+    for i in range(0, number_of_players):
+        player_names.append(args.player_names[i % (len(args.player_names))])
+    return player_names
+
 def end():
     print('Goodbye!')
     exit()
@@ -103,13 +113,29 @@ def end():
 if __name__ == "__main__":
     threads = []
 
-    print('Playing strategy', args.strategy)
+    if args.game_code == None:
+        args.game_code = input('Please specify the game code: ')
+
+    print('------- MAIN SETTINGS --------')
+    print('game code:\t\t', args.game_code, sep='')
+    print('strategy:\t\t', args.strategy, sep='')
+    print('number of questions:\t', args.number_of_questions, sep='')
+    print('number of answers:\t', args.number_of_answers, sep='')
+    print('------------------------------')
+    print('--- AVAILABLE PLAYER NAMES ---')
+    for i in range(0,len(args.player_names)):
+        print('"', args.player_names[i], '"', sep='', end='')
+        if i < (len(args.player_names) - 1):
+            print(', ', end='')
+    print('\n------------------------------')
+
     if args.strategy == 'alwaysB':
         if args.number_of_answers < 2:
             print('[ERROR] Not enough answers to choose B!')
             end()
 
-        threads.append(threading.Thread(target=player_thread_function, args=(args.game_code, 'Player', [1]*args.number_of_questions,)))
+        player_names = get_player_names(1)
+        threads.append(threading.Thread(target=player_thread_function, args=(args.game_code, player_names[0], [1]*args.number_of_questions,)))
 
     while True:
         print('I will now create', len(threads), 'player(s).', end=' ')
