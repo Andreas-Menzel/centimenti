@@ -1,3 +1,4 @@
+import argparse
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -5,6 +6,31 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 import threading
 import time
+
+
+# Setup argument parser
+parser = argparse.ArgumentParser(description='Bot that plays quizzes on menti.com', prog='centimenti')
+parser.add_argument('--version', action='version', version='%(prog)s alpha-0.0.1')
+parser.add_argument('-c', '--game_code',
+    type=int,
+    help='Specify the game code.')
+parser.add_argument('-s', '--strategy',
+    choices=['alwaysB', 'everythingOnce'],
+    default='alwaysB',
+    help='Specify the playing strategy.')
+parser.add_argument('-q', '--number_of_questions',
+    type=int,
+    choices=range(1,65),
+    default=4,
+    metavar='',
+    help='Specify the number of questions asked.')
+parser.add_argument('-a', '--number_of_answers',
+    type=int,
+    choices=range(1,16),
+    default=4,
+    metavar='',
+    help='Specify the maximum number of answers the player can choose in each question.')
+args = parser.parse_args()
 
 
 class Player:
@@ -61,7 +87,7 @@ def player_thread_function(game_code, player_name, answers):
         player.guess(a)
         player.check_result()
 
-    time.sleep(5)
+    time.sleep(20)
     player.cleanup()
 
 
@@ -69,17 +95,37 @@ def player_thread_function(game_code, player_name, answers):
 event_join_game = threading.Event()
 
 
+def end():
+    print('Goodbye!')
+    exit()
+
+
 if __name__ == "__main__":
     threads = []
-    threads.append(threading.Thread(target=player_thread_function, args=("10491429", "Player 1", [0,1,2,3],)))
-    threads.append(threading.Thread(target=player_thread_function, args=("10491429", "Player 2", [1,2,3,0],)))
-    threads.append(threading.Thread(target=player_thread_function, args=("10491429", "Player 3", [2,3,0,1],)))
-    threads.append(threading.Thread(target=player_thread_function, args=("10491429", "Player 4", [3,0,1,2],)))
+
+    print('Playing strategy', args.strategy)
+    if args.strategy == 'alwaysB':
+        if args.number_of_answers < 2:
+            print('[ERROR] Not enough answers to choose B!')
+            end()
+
+        threads.append(threading.Thread(target=player_thread_function, args=(args.game_code, 'Player', [1]*args.number_of_questions,)))
+
+    while True:
+        print('I will now create', len(threads), 'player(s).', end=' ')
+        confirmation = input('OK? (yes/no) ')
+        if confirmation == 'yes':
+            break
+        elif confirmation == 'no':
+            end()
+        else:
+            print('Please type "yes" or "no".')
+
     for t in threads:
         t.start()
 
-    time.sleep(5)
+    #time.sleep(5)
     event_join_game.set()
 
-    for t in threads:
-        t.join()
+    #for t in threads:
+    #    t.join()
