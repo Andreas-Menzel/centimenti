@@ -60,18 +60,42 @@ class Player:
         elem_vote_key_submit.click()
 
         # Enter name
-        elem_quiz_name = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, 'quiz-name')))
+        elem_quiz_name = WebDriverWait(self.driver, 300).until(
+            EC.presence_of_element_located((By.ID, 'quiz-name'))
+        )
         elem_quiz_name.send_keys(self.player_name)
         elem_quiz_name_submit = self.driver.find_element(By.CSS_SELECTOR, 'button[type="submit"]')
         elem_quiz_name_submit.click()
 
     def guess(self, answer):
-        print('Player "', self.player_name, '" guesses ', answer, '.',  sep='')
-        pass
+        print('Player "', self.player_name, '" is ready to answer.', sep='')
+        WebDriverWait(self.driver, 600).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, 'fieldset'))
+        )
+
+        elem_answer_buttons = self.driver.find_elements(By.CSS_SELECTOR, 'fieldset button')
+        if(len(elem_answer_buttons) >= answer):
+            print('Player "', self.player_name, '" guesses ', answer, '.',  sep='')
+            elem_answer_buttons[answer].click()
+        else:
+            print('Player "', self.player_name, '" could not guess answer ', answer, '. Too few possible answers.',  sep='')
 
     def check_result(self):
+        print('Player "', self.player_name, '" is waiting for results.',  sep='')
+        WebDriverWait(self.driver, 600).until(
+            EC.text_to_be_present_in_element((By.CSS_SELECTOR, 'h1'), 'Loading result ...')
+        )
+        WebDriverWait(self.driver, 600).until_not(
+            EC.text_to_be_present_in_element((By.CSS_SELECTOR, 'h1'), 'Loading result ...')
+        )
+        elem_result_text = self.driver.find_element(By.CSS_SELECTOR, 'h1')
+        if elem_result_text.text == 'Correct answer!':
+            print('Player "', self.player_name, '" chose the correct answer.',  sep='')
+        elif elem_result_text.text == 'Wrong answer':
+            print('Player "', self.player_name, '" chose the wrong answer.',  sep='')
+        else:
+            print('Player "', self.player_name, '" does not know wheather the answer was correct or not.',  sep='')
         # Maybe stop playing if answer was incorrect
-        pass
 
     def cleanup(self):
         self.driver.quit()
@@ -82,7 +106,6 @@ def player_thread_function(game_code, player_name, answers):
     player = Player(game_code, player_name, answers)
     print('Player "', player_name, '" successfully created. Now ready to join the game.', sep='')
 
-    event_join_game.wait()
     print('Player "', player_name, '" is now joining the game...', sep='')
     player.join_game()
     print('Player "', player_name, '" successfully joined the game!', sep='')
@@ -93,10 +116,6 @@ def player_thread_function(game_code, player_name, answers):
 
     time.sleep(20)
     player.cleanup()
-
-
-
-event_join_game = threading.Event()
 
 
 def get_player_names(number_of_players):
@@ -149,9 +168,6 @@ if __name__ == "__main__":
 
     for t in threads:
         t.start()
-
-    #time.sleep(5)
-    event_join_game.set()
 
     #for t in threads:
     #    t.join()
