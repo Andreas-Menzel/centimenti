@@ -1,11 +1,12 @@
 import argparse
+import itertools
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 import threading
-import time
+from time import sleep
 
 
 # Setup argument parser
@@ -34,6 +35,9 @@ parser.add_argument('-n', '--player_names',
     nargs='+',
     default=['Alice', 'Bob'],
     help='Specify a list of names that will be used to create the players.')
+parser.add_argument('--slow_start',
+    action='store_true',
+    help='The players will be created with a small delay.')
 args = parser.parse_args()
 
 
@@ -156,6 +160,20 @@ if __name__ == "__main__":
         player_names = get_player_names(1)
         threads.append(threading.Thread(target=player_thread_function, args=(args.game_code, player_names[0], [1]*args.number_of_questions,)))
 
+    elif args.strategy == 'everythingOnce':
+        if args.number_of_questions != args.number_of_answers:
+            print('[ERROR] Number of questions must be equal to number of answers!')
+            end()
+
+        one_answer = list(range(0, args.number_of_questions))
+        all_answers = list(itertools.permutations(one_answer))
+
+        player_names = get_player_names(len(all_answers))
+
+        for i in range(0, len(all_answers)):
+            threads.append(threading.Thread(target=player_thread_function, args=(args.game_code, player_names[i], all_answers[i],)))
+
+
     while True:
         print('I will now create', len(threads), 'player(s).', end=' ')
         confirmation = input('OK? (yes/no) ')
@@ -167,6 +185,8 @@ if __name__ == "__main__":
             print('Please type "yes" or "no".')
 
     for t in threads:
+        if args.slow_start:
+            sleep(2)
         t.start()
 
     #for t in threads:
