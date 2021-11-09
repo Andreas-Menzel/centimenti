@@ -11,7 +11,7 @@ from time import sleep
 
 # Setup argument parser
 parser = argparse.ArgumentParser(description='Bot that plays quizzes on menti.com', prog='centimenti')
-parser.add_argument('--version', action='version', version='%(prog)s alpha-0.0.1')
+parser.add_argument('--version', action='version', version='%(prog)s v1.0.0')
 parser.add_argument('-c', '--game_code',
     type=int,
     help='Specify the game code.')
