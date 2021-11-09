@@ -33,7 +33,7 @@ parser.add_argument('-a', '--number_of_answers',
     help='Specify the maximum number of answers the player can choose in each question.')
 parser.add_argument('-n', '--player_names',
     nargs='+',
-    default=['Alice', 'Bob'],
+    default=['Alice', 'Bob', 'Robinson Crusoe', 'Ready Player One', 'I, Robot', 'Excellence'],
     help='Specify a list of names that will be used to create the players.')
 parser.add_argument('--slow_start',
     action='store_true',
