@@ -4,6 +4,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 import threading
 from time import sleep
@@ -38,6 +39,9 @@ parser.add_argument('-n', '--player_names',
 parser.add_argument('--slow_start',
     action='store_true',
     help='The players will be created with a small delay.')
+parser.add_argument('--headless',
+    action='store_true',
+    help='Operates the browsers headless.')
 args = parser.parse_args()
 
 
@@ -48,7 +52,12 @@ class Player:
     answers = []
 
     def __init__(self, game_code, player_name, answers):
-        self.driver = webdriver.Firefox()
+        if args.headless:
+            opts = Options()
+            opts.headless = True
+            self.driver = webdriver.Firefox(options=opts)
+        else:
+            self.driver = webdriver.Firefox()
         self.driver.set_window_size(400, 600)
         self.game_code = game_code
         self.player_name = player_name
