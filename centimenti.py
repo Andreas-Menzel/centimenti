@@ -180,7 +180,20 @@ if __name__ == "__main__":
         if confirmation == 'yes':
             break
         elif confirmation == 'no':
-            end()
+            while True:
+                print('Which players should be created? (0/x;y - x >= 0 && y <= ', len(threads), ')', sep='', end=' ')
+                which_players = input('> ')
+                if which_players == '0':
+                    end()
+                else:
+                    which_players_sep = which_players.split(';')
+                    first_player = int(which_players_sep[0])
+                    last_player = int(which_players_sep[1])
+                    if first_player < 0 or first_player > len(threads) or last_player < 0 or last_player > len(threads) or first_player == last_player:
+                        continue
+                    else:
+                        threads = threads[first_player : last_player]
+                        break
         else:
             print('Please type "yes" or "no".')
 
