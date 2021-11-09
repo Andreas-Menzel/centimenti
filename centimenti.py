@@ -118,7 +118,7 @@ def player_thread_function(game_code, player_name, answers):
         player.guess(a)
         player.check_result()
 
-    time.sleep(20)
+    sleep(600)
     player.cleanup()
 
 
