@@ -95,6 +95,10 @@ class Player:
     def join_game(self):
         self.driver.get("https://menti.com")
 
+        WebDriverWait(self.driver, 600).until(
+            EC.presence_of_element_located((By.ID, 'enter-vote-key'))
+        )
+
         # Enter game code
         elem_vote_key = self.driver.find_element(By.ID, 'enter-vote-key')
         elem_vote_key.send_keys(self.game_code)
