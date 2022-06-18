@@ -1,3 +1,19 @@
+#!/usr/bin/env python3
+
+#-------------------------------------------------------------------------------
+# centimenti
+#
+# Python bot for playing [mentimeter](https://www.mentimeter.com/) quizzes with
+#     brute-force or 'alwaysB' strategy.
+#
+# https://github.com/Andreas-Menzel/centimenti
+#-------------------------------------------------------------------------------
+# @author: Andreas Menzel
+# @license: MIT License
+# @copyright: Copyright (c) 2021 Andreas Menzel
+#-------------------------------------------------------------------------------
+
+
 import argparse
 import itertools
 from selenium import webdriver
@@ -45,12 +61,20 @@ parser.add_argument('--headless',
 args = parser.parse_args()
 
 
+# Player
+#
+# Represents a single player and holds information about the game and planned
+#     answers. It implements functions for joining a game, answering a question
+#     and checking whether the selected answer was correct or not.
 class Player:
     driver = None
     game_code = ""
     player_name = ""
     answers = []
 
+    # __init__
+    #
+    # Initializes variables and browser object.
     def __init__(self, game_code, player_name, answers):
         if args.headless:
             opts = Options()
@@ -63,6 +87,11 @@ class Player:
         self.player_name = player_name
         self.answers = answers
 
+    # join_game
+    #
+    # Opens the browser and enters the game code and name.
+    #
+    # @return   None
     def join_game(self):
         self.driver.get("https://menti.com")
 
@@ -80,6 +109,13 @@ class Player:
         elem_quiz_name_submit = self.driver.find_element(By.CSS_SELECTOR, 'button[type="submit"]')
         elem_quiz_name_submit.click()
 
+    # guess
+    #
+    # Waits until the next question is open and guesses the specified answer.
+    #
+    # @param    int     answer  The number of the answer. TODO: >=?
+    #
+    # @return   None
     def guess(self, answer):
         print('Player "', self.player_name, '" is ready to answer.', sep='')
         WebDriverWait(self.driver, 600).until(
@@ -93,6 +129,12 @@ class Player:
         else:
             print('Player "', self.player_name, '" could not guess answer ', answer, '. Too few possible answers.',  sep='')
 
+    # check_result
+    #
+    # Waits until the results have loaded and checks whether the selected answer
+    #     was correct.
+    #
+    # @return   None
     def check_result(self):
         print('Player "', self.player_name, '" is waiting for results.',  sep='')
         WebDriverWait(self.driver, 600).until(
@@ -108,12 +150,32 @@ class Player:
             print('Player "', self.player_name, '" chose the wrong answer.',  sep='')
         else:
             print('Player "', self.player_name, '" does not know wheather the answer was correct or not.',  sep='')
-        # Maybe stop playing if answer was incorrect
+        # TODO: Maybe stop playing if answer was incorrect depending on strategy
 
+    # cleanup
+    #
+    # Closes the browser
+    #
+    # @return   None
     def cleanup(self):
         self.driver.quit()
 
 
+# player_thread_function
+#
+# Creates a player which will automatically join the game and guess the given
+#     answers. The player will exist for another 5 minutes after it is finished
+#     playing (to show the victory screen).
+#
+# @param    string  game_code       The mentimeter game code.
+# @param    string  player_name     The name of the player that will be
+#                                       generated here.
+# @param    [int]   answers         A list representing the sequence of ansers
+#                                       the player will select.
+#
+# @return   None
+#
+# @note:    This function should be called from within a separate thread.
 def player_thread_function(game_code, player_name, answers):
     print('Creating player "', player_name, '"...', sep='')
     player = Player(game_code, player_name, answers)
@@ -131,18 +193,38 @@ def player_thread_function(game_code, player_name, answers):
     player.cleanup()
 
 
+# get_player_names
+#
+# Creates a list of correct length containing player names.
+#
+# @param    int         number_of_players   The number of players that will be
+#                                               created.
+#
+# @return   [string]    Returns a list with the correct length containing player
+#                           names.
 def get_player_names(number_of_players):
     player_names = []
     for i in range(0, number_of_players):
         player_names.append(args.player_names[i % (len(args.player_names))])
     return player_names
 
+
+# end
+#
+# Terminates the script
+#
+# @return   None
 def end():
     print('Goodbye!')
     exit()
 
 
-if __name__ == "__main__":
+# main
+#
+# Main function. Creates the players.
+#
+# @return   None
+def main():
     threads = []
 
     if args.game_code == None:
@@ -213,3 +295,8 @@ if __name__ == "__main__":
 
     #for t in threads:
     #    t.join()
+
+
+if __name__ == "__main__":
+    main()
+    end()
