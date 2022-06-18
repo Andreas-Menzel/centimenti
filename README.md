@@ -33,7 +33,7 @@ control a web-browser.
 pip install selenium
 ```
 Make sure you also have the **Firefox** browser driver installed and added to
-path. The folliwing two links may help:
+path. The following two links may help:
 - [https://www.selenium.dev/documentation/getting_started/installing_browser_drivers/](https://www.selenium.dev/documentation/getting_started/installing_browser_drivers/)
 - [https://www.selenium.dev/documentation/webdriver/getting_started/install_drivers/#2-the-path-environment-variable](https://www.selenium.dev/documentation/webdriver/getting_started/install_drivers/#2-the-path-environment-variable)
 
@@ -69,7 +69,7 @@ optional arguments:
 
 ## See centimenti in action
 
-The following two screenshots show the terminal and all bots in a demo quiz.
+The following two screenshots show the terminal and a few bots in a demo quiz.
 
 <details><summary>Joining the game.</summary><p>
 
@@ -160,7 +160,7 @@ Due to [known problem](#Known-problems) 1 we had to start guessing from question
 
 - (1) Vallah als ob ich so gut bin
 
-![Question 08](demo/real-life-demo/Q6.png)
+![Question 08](demo/real-life-demo/Q8.png)
 
 </p></details>
 
@@ -198,8 +198,8 @@ fix these issues. Feel free to fix the problems and create a pull request.
 
 ## Disclaimer
 
-Please use this script wisely. Most professors incorporating quizzes from
-mentimenter, etc. into their lectures do so in order to make learning more fun.
-We used this script because it was fun implementing and seing 'our' names on the
-leaderboard. As soon as we won one quiz we stopped using the script for reasons
-of fairness towards our fellow students.
+Please use this script wisely. Most professors that use quizzes from
+mentimenter, etc. do so in order to make learning more fun. We used this script
+because it was fun implementing and seeing 'our' names on the leaderboard. As
+soon as we won one quiz we stopped using the script for reasons of fairness
+towards our fellow students.
